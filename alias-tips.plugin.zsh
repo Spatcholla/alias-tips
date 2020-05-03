@@ -41,11 +41,21 @@ _alias_tips__preexec () {
   shell_aliases=$(\alias)
 
   shell_functions=$(\functions | \egrep '^[a-zA-Z].+ \(\) \{$')
+  
+  # Get Installed Python Version
+  if [[ "$(command python3 -V)" =~ "Python 3" ]]
+    then
+      python_version='python3'
+  elif [[ "$(command python -V)" =~ "Python 2" ]]
+    then
+      python_version='python'
+  fi
+
 
   # Exit code returned from python script when we want to force use of aliases.
   local force_exit_code=10
   echo $shell_functions "\n" $git_aliases "\n" $shell_aliases | \
-    python ${_alias_tips__PLUGIN_DIR}/alias-tips.py $*
+    $python_version ${_alias_tips__PLUGIN_DIR}/alias-tips.py $*
   ret=$?
   if [[ $ret = $force_exit_code ]]; then kill -s INT $$ ; fi
 }
